@@ -1,21 +1,16 @@
-image: registry.gitlab.com/motorica-org/gitlab-ci-android:master
+image: node
 
-stages:
-- build
+stage:
+ # I just want to lint, so I will create a "lint" stage
+ - lint
 
-before_script:
-- export GRADLE_USER_HOME=$(pwd)/.gradle
-- chmod +x ./gradlew
-
-cache:
-  key: ${CI_PROJECT_ID}
-  paths:
-  - .gradle/
-
-build:
-  stage: build
-  script:
-  - ./gradlew assembleDebug
-  artifacts:
-    paths:
-    - app/build/outputs/apk/app-debug.apk
+# Lets name our Job eslint, because that's what it's doing.
+eslint:
+ # tell eslint what stage it is. (This could also be build or test for example)
+ stage: lint
+ # What scripts do we want to run?
+ script:
+    # install eslint
+    - npm i eslint
+    # Run eslint
+    - node_modules/eslint/bin/eslint.js .
