@@ -8,7 +8,7 @@ eslint:
   script:
     # Install eslint
     - npm install eslint
-    - npm install estlint eslint-config-airbnb
+    - npm install estlint eslint-config-airbnb --global
     - npm install estlint eslint-config-prettier
     - npm install estlint eslint-plugin-flowtype # Any ideas on what I might want to do next?
     - npm install estlint eslint-plugin-import
