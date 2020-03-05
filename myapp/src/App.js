@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, TouchableHighlight, TouchableOpacity, TouchableNativeFeedback, TouchableWithoutFeedback, View } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
   order: {
@@ -22,14 +22,6 @@ const styles = StyleSheet.create({
 });
 
 export default class AlignItemsBasics extends Component {
-    _onPressButton() {
-        alert('Vi leter etter taxi for deg! Lykke til!')
-    }
-
-    _onPressButton1() {
-        alert('meny')
-    }
-
   render() {
     return (
         <View
@@ -46,11 +38,7 @@ export default class AlignItemsBasics extends Component {
                 justifyContent: 'space-between',
               }}>
             <Text style={styles.FFT}>Fast Track Taxi</Text>
-              <TouchableOpacity onPress={this._onPressButton1}>
-                  <View style={styles.button}>
-                      <Text style={styles.meny}>Meny</Text>
-                  </View>
-              </TouchableOpacity>
+            <Text style={styles.meny}>Meny</Text>
           </View>
 
           <View style={{flex: 1, backgroundColor: 'powderblue'}} />
@@ -59,12 +47,8 @@ export default class AlignItemsBasics extends Component {
                 flex: 0.3,
                 backgroundColor: 'steelblue',
               }}>
-              <TouchableHighlight onPress={this._onPressButton} underlayColor="powderblue">
-                  <View style={styles.button}>
-                      <Text style={styles.order}>Bestill Taxi</Text>
-                      <Text style={styles.order}>30Kr</Text>
-                  </View>
-              </TouchableHighlight>
+            <Text style={styles.order}> Besill Taxi</Text>
+            <Text style={styles.order}>Pris 30kr</Text>
           </View>
         </View>
     );
