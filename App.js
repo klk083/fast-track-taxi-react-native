@@ -1,72 +1,118 @@
+import 'react-native-gesture-handler';
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, TouchableHighlight, TouchableOpacity, TouchableNativeFeedback, TouchableWithoutFeedback, View } from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import {
+  Platform,
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Alert,
+  Button,
+} from 'react-native';
 
-const styles = StyleSheet.create({
-  order: {
-    color: 'blue',
-    fontWeight: 'bold',
-    fontSize: 30,
-    alignSelf: 'center',
-  },
-  FFT: {
-    fontWeight: 'bold',
-    fontSize: 30,
-    color: 'yellow',
-    alignSelf: 'center',
-  },
-  meny: {
-    color: 'black',
-    fontSize: 25,
-    alignSelf: 'flex-end',
-  },
+const Stack = createStackNavigator();
+
+const instructions = Platform.select({
+  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
+  android:
+    'Les vår Personvern.\n' +
+    'Trykk "Bekreft og fortsett" for å akseptere Servicevilkår.',
 });
 
-export default class AlignItemsBasics extends Component {
-    _onPressButton() {
-        alert('Vi leter etter taxi for deg! Lykke til!')
-    }
+export default class SplashScreen extends Component<{}> {
+  constructor() {
+    super();
+    this.state = {
+      isVisible: true,
+    };
+  }
+  Hide_Splash_Screen = () => {
+    this.setState({
+      isVisible: false,
+    });
+  };
 
-    _onPressButton1() {
-        alert('meny')
-    }
+  componentDidMount() {
+    var that = this;
+    setTimeout(function() {
+      that.Hide_Splash_Screen();
+    }, 5000);
+  }
 
   render() {
-    return (
-        <View
-            style={{
-              flex: 1,
-              flexDirection: 'column',
-              alignItems: 'stretch',
-            }}>
-          <View
-              style={{
-                flex: 0.15,
-                backgroundColor: 'steelblue',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-            <Text style={styles.FFT}>Fast Track Taxi</Text>
-              <TouchableOpacity onPress={this._onPressButton1}>
-                  <View style={styles.button}>
-                      <Text style={styles.meny}>Meny</Text>
-                  </View>
-              </TouchableOpacity>
-          </View>
-
-          <View style={{flex: 1, backgroundColor: 'powderblue'}} />
-          <View
-              style={{
-                flex: 0.3,
-                backgroundColor: 'steelblue',
-              }}>
-              <TouchableHighlight onPress={this._onPressButton} underlayColor="powderblue">
-                  <View style={styles.button}>
-                      <Text style={styles.order}>Bestill Taxi</Text>
-                      <Text style={styles.order}>30Kr</Text>
-                  </View>
-              </TouchableHighlight>
-          </View>
+    let Splash_Screen = (
+      <View style={styles.SplashScreen_RootView}>
+        <View style={styles.SplashScreen_ChildView}>
+          <Image
+            source={require('D:\\BachelorOppgave\\FastTrackTaxi_ReactNative\\AppIcons\\fast_track_taxi_logo_ferdig.png')}
+            style={{width: '100%', height: '100%', resizeMode: 'contain'}}
+          />
         </View>
+      </View>
+    );
+    return (
+      <View style={styles.MainContainer}>
+        <View style={styles.container}>
+          <View>
+            <Text style={styles.welcome}>Velkommen til</Text>
+          </View>
+          <Image
+            source={require('D:\\BachelorOppgave\\FastTrackTaxi_ReactNative\\AppIcons\\fast_track_taxi_logo_ferdig.png')}
+            style={{width: 380, height: 380}}
+          />
+          <Text style={styles.instructions}>{instructions}</Text>
+          <Button
+            onPress={this.onPressButton}
+            title="BEKREFT OG FORTSETT"
+            color="#009933"
+          />
+        </View>
+        {this.state.isVisible === true ? Splash_Screen : null}
+      </View>
     );
   }
 }
+const styles = StyleSheet.create({
+  MainContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: Platform.OS === 'ios' ? 20 : 0,
+  },
+
+  SplashScreen_RootView: {
+    justifyContent: 'center',
+    flex: 1,
+    margin: 10,
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+
+  SplashScreen_ChildView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#34eb37',
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  welcome: {
+    fontSize: 60,
+    textAlign: 'center',
+    margin: 10,
+    color: '#000000',
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#000000',
+    marginBottom: 5,
+  },
+});
