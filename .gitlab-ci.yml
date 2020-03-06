@@ -1,19 +1,36 @@
-image: node
+.job_template: &job_deploy
+  stage: deploy
+  before_script:
+    - npm install
+  tags:
+    - rnbuild
+  after_script:
+    - cp $OUTPUT_PATH.$FILE_TYPE $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME.$FILE_TYPE
+  artifacts:
+    name: "$CI_PROJECT_NAME-$PLATFORM-$CI_COMMIT_REF_NAME"
+    paths:
+    - $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME.$FILE_TYPE
+    expire_in: 7 days
+  when: manual
 
-stages:
-  - lint
-
-eslint:
-  stage: lint
+deploy:android:prod:
+  variables:
+    PLATFORM: android
+    FILE_TYPE: apk
+    OUTPUT_PATH: android/app/build/outputs/apk/app-release
+  <<: *job_deploy
   script:
-    # Install eslint
-    - npm install eslint
-    - npm install estlint eslint-config-airbnb --global
-    - npm install estlint eslint-config-prettier
-    - npm install estlint eslint-plugin-flowtype # Any ideas on what I might want to do next?
-    - npm install estlint eslint-plugin-import
-    - npm install estlint eslint-plugin-jsx-a11y
-    - npm install estlint eslint-plugin-prettier
-    - npm install estlint eslint-plugin-react
-    # Run eslint
-    - node_modules/eslint/bin/eslint.js .
+    - cd android && ./gradlew assembleRelease -PMYAPP_RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD -PMYAPP_RELEASE_KEY_PASSWORD=$KEYSTORE_PASSWORD
+  
+deploy:ios:prod:
+  variables:
+    PLATFORM: ios
+    FILE_TYPE: ipa
+    OUTPUT_PATH: ./$CI_PROJECT_NAME
+  <<: *job_deploy
+  script:
+    - export PACKAGE_NAME=$(node -p -e "require('./package.json').name")
+    - cd ios
+    - xcodebuild -scheme $PACKAGE_NAME archive -archivePath $PACKAGE_NAME.xcarchive -allowProvisioningUpdates
+    - xcodebuild -exportArchive -archivePath ./$PACKAGE_NAME.xcarchive -exportPath . -exportOptionsPlist $PACKAGE_NAME/Info.plist
+    - mv $PACKAGE_NAME.ipa ../$PACKAGE_NAME.ipa
