@@ -5,6 +5,7 @@ import {
   View,
   Text,
   Image,
+  Button,
   TouchableOpacity,
   Alert,
 } from 'react-native';
@@ -33,7 +34,7 @@ export default class SplashScreen extends Component<{}> {
       <View style={styles.SplashScreen_RootView}>
         <View style={styles.SplashScreen_ChildView}>
           <Image
-            source={require('D:\\BachelorOppgave\\FastTrackTaxi_ReactNative\\AppIcons\\fast_track_taxi_logo_ferdig.png')}
+            source={require('./AppIcons/fast_track_taxi_logo_ferdig.png')}
             style={{width: '100%', height: '100%', resizeMode: 'contain'}}
           />
         </View>
@@ -41,9 +42,26 @@ export default class SplashScreen extends Component<{}> {
     );
     return (
       <View style={styles.MainContainer}>
-        <Text style={{textAlign: 'center'}}>
-          Skulle komme til Velkommen sida, men fortsatt vet ikke hvordan :(
-        </Text>
+        <View style={styles.container}>
+          <View>
+            <Text style={styles.welcome}>Velkommen til</Text>
+          </View>
+          <Image
+            source={require('./AppIcons/fast_track_taxi_logo_ferdig.png')}
+            style={{width: 380, height: 380}}
+          />
+          <Text style={styles.instructions}>
+            Les vår Personvern. Trykk "Bekreft og fortsett" for å akseptere
+            Servicevilkår.
+          </Text>
+          <View style={styles.button}>
+            <Button
+              onPress={this.onPressButton}
+              title="BEKREFT OG FORTSETT"
+              color="#009933"
+            />
+          </View>
+        </View>
         {this.state.isVisible === true ? Splash_Screen : null}
       </View>
     );
@@ -69,7 +87,30 @@ const styles = StyleSheet.create({
   SplashScreen_ChildView: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#00BCD4',
+    backgroundColor: '#009933',
     flex: 1,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  welcome: {
+    fontSize: 60,
+    textAlign: 'center',
+    color: '#000000',
+  },
+  instructions: {
+    margin: 5,
+    textAlign: 'center',
+    color: '#000000',
+    fontSize: 25,
+    marginBottom: 5,
+  },
+  button: {
+    margin: 20,
+    minWidth: '80%',
+    minHeight: '15%',
   },
 });

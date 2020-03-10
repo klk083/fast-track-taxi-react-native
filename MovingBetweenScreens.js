@@ -1,3 +1,7 @@
+/*
+ * Deprecated since 09.03.2020, Karol
+ */
+
 import React from 'react';
 import {View, Text, Button} from 'react-native';
 import {createStackNavigator, createAppContainer} from 'react-navigation';

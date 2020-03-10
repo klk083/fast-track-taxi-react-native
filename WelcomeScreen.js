@@ -28,7 +28,7 @@ export default class App extends Component {
           <Text style={styles.welcome}>Velkommen til</Text>
         </View>
         <Image
-          source={require('D:\\BachelorOppgave\\FastTrackTaxi_ReactNative\\AppIcons\\fast_track_taxi_logo_ferdig.png')}
+          source={require('./fast_track_taxi_logo_ferdig.png')}
           style={{width: 380, height: 380}}
         />
         <Text style={styles.instructions}>{instructions}</Text>
