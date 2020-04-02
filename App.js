@@ -1,72 +1,219 @@
-import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, TouchableHighlight, TouchableOpacity, TouchableNativeFeedback, TouchableWithoutFeedback, View } from 'react-native';
+import React from 'react';
+import {
+  FlatList,
+  TouchableHighlight,
+  ActivityIndicator,
+  Text,
+  View,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Button,
+  Alert,
+} from 'react-native';
 
-const styles = StyleSheet.create({
-  order: {
-    color: 'blue',
-    fontWeight: 'bold',
-    fontSize: 30,
-    alignSelf: 'center',
-  },
-  FFT: {
-    fontWeight: 'bold',
-    fontSize: 30,
-    color: 'yellow',
-    alignSelf: 'center',
-  },
-  meny: {
-    color: 'black',
-    fontSize: 25,
-    alignSelf: 'flex-end',
-  },
-});
+export default class FetchExample extends React.Component {
+  constructor(props) {
+    super(props);
 
-export default class AlignItemsBasics extends Component {
-    _onPressButton() {
-        alert('Vi leter etter taxi for deg! Lykke til!')
-    }
+    this.state = {
+      catName: 'ole',
+      owner: 'sara',
+      pnum: '1234',
+      lat: 1.01,
+      long: -1,
+      isLoading: true,
+    };
+    this.onPress = this.onPress.bind(this);
+    this.onPress2 = this.onPress2.bind(this);
+    this.onPress3 = this.onPress3.bind(this);
+    this.onPress4 = this.onPress4.bind(this);
+    this.onPress5 = this.onPress5.bind(this);
+    this.findCoordinates = this.findCoordinates.bind(this);
+  }
 
-    _onPressButton1() {
-        alert('meny')
-    }
+  componentDidMount() {
+    return this.fetchlist();
+  }
+
+  findCoordinates() {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const location = JSON.stringify(position);
+
+        this.setState({location});
+      },
+      error => Alert.alert(error.message),
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+    );
+  }
+
+  fetchlist() {
+    fetch('http://192.168.1.19:8080/test')
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState(
+          {
+            isLoading: false,
+            dataSource: responseJson,
+          },
+          function() {},
+        );
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    this.render();
+  }
+
+  onPress() {
+    fetch('http://192.168.1.19:8080/cats')
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState(
+          {
+            isLoading: false,
+            // dataSource: responseJson,
+          },
+          function() {},
+        );
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    this.fetchlist();
+  }
+
+  onPress2() {
+    fetch('http://192.168.1.19:8080/delete')
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState(
+          {
+            isLoading: false,
+            // dataSource: responseJson,
+          },
+          function() {},
+        );
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    this.fetchlist();
+  }
+  onPress3() {
+    fetch('http://192.168.1.19:8080/add/ole-petter-123')
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState(
+          {
+            isLoading: false,
+            // dataSource: responseJson,
+          },
+          function() {},
+        );
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    this.fetchlist();
+  }
+
+  onPress4() {
+    fetch('http://192.168.1.19:8080/new', {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({
+        catName: this.state.catName,
+        owner: this.state.owner,
+        pnum: this.state.pnum,
+      }),
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState(
+          {
+            isLoading: false,
+            // dataSource: responseJson,
+          },
+          function() {},
+        );
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    this.fetchlist();
+  }
+
+  onPress5() {
+    fetch('http://192.168.1.19:8080/loc', {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({
+        lat: this.state.lat,
+        long: this.state.long,
+      }),
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState(
+          {
+            isLoading: false,
+            location: responseJson,
+          },
+          function() {},
+        );
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    this.fetchlist();
+  }
 
   render() {
-    return (
-        <View
-            style={{
-              flex: 1,
-              flexDirection: 'column',
-              alignItems: 'stretch',
-            }}>
-          <View
-              style={{
-                flex: 0.15,
-                backgroundColor: 'steelblue',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-            <Text style={styles.FFT}>Fast Track Taxi</Text>
-              <TouchableOpacity onPress={this._onPressButton1}>
-                  <View style={styles.button}>
-                      <Text style={styles.meny}>Meny</Text>
-                  </View>
-              </TouchableOpacity>
-          </View>
-
-          <View style={{flex: 1, backgroundColor: 'powderblue'}} />
-          <View
-              style={{
-                flex: 0.3,
-                backgroundColor: 'steelblue',
-              }}>
-              <TouchableHighlight onPress={this._onPressButton} underlayColor="powderblue">
-                  <View style={styles.button}>
-                      <Text style={styles.order}>Bestill Taxi</Text>
-                      <Text style={styles.order}>30Kr</Text>
-                  </View>
-              </TouchableHighlight>
-          </View>
+    if (this.state.isLoading) {
+      return (
+        <View style={{flex: 1, padding: 20}}>
+          <ActivityIndicator />
         </View>
+      );
+    }
+
+    return (
+      <View>
+        <FlatList
+          data={this.state.dataSource}
+          renderItem={({item}) => (
+            <Text>
+              {item.owner}, {item.catName}
+            </Text>
+          )}
+          keyExtractor={({id}, index) => id}
+        />
+        <Button title="add" style={{paddingTop: 33}} onPress={this.onPress4} />
+        <Button
+          title="delete"
+          style={{paddingTop: 33}}
+          onPress={this.onPress2}
+        />
+        <Button title="geo" onPress={this.onPress5} />
+        <Text>Location: {this.state.location}</Text>
+      </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#0f0f0f',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+});
