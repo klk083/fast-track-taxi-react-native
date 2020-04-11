@@ -1,21 +1,83 @@
-import React, {Component} from 'react';
-import {
-  Platform,
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  Button,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-export default class SplashScreen extends Component<{}> {
-  constructor() {
-    super();
-    this.state = {
-      isVisible: true,
-    };
+import React from 'react';
+import { StyleSheet, View, Image } from 'react-native';
+import Constants from 'expo-constants/src/Constants';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
+import WelcomeScreen from "./WelcomeScreen";
+import Privacy from "./Common_files/Privacy";
+import Terms_of_service from "./Common_files/Terms_of_service";
+import Registrering from "./Registration/Registrering";
+import Verifying_mob_num from "./Registration/Verifying_mob_num";
+import Client_taxi_confirmation from "./Client/Client_taxi_confirmation";
+
+const RegistrationStack = createStackNavigator();
+
+class NewRegistrationStack extends React.Component {
+  render() {
+    return (
+        <RegistrationStack.Navigator>
+          <RegistrationStack.Screen
+              name="Home"
+              component={WelcomeScreen}
+              options={{
+                headerShown: false
+              }}
+          />
+          <RegistrationStack.Screen
+              name='Privacy'
+              component={Privacy}
+              options={{
+                title: 'Personvern',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                  fontSize: 30,
+                }
+              }}
+          />
+          <RegistrationStack.Screen
+              name='Terms_of_service'
+              component={Terms_of_service}
+              options={{
+                title: 'Servicevilkår',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                  fontSize: 30,
+                }
+              }}
+          />
+          <RegistrationStack.Screen
+              name='Number_registration'
+              component={Registrering}
+              options={{
+                title: 'Registrer mobilnummer',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                  fontSize: 30,
+                }
+              }}
+          />
+          <RegistrationStack.Screen
+              name='Number_verification'
+              component={Verifying_mob_num}
+              options={{
+                headerTitle: 'Verifisering',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                  fontSize: 30,
+                }
+              }}
+          />
+        </RegistrationStack.Navigator>
+    )
   }
+}
+
+class SplashScreen extends React.Component {
+  state = {
+    isVisible: true,
+  };
+
   Hide_Splash_Screen = () => {
     this.setState({
       isVisible: false,
@@ -30,49 +92,43 @@ export default class SplashScreen extends Component<{}> {
   }
 
   render() {
-    let Splash_Screen = (
-      <View style={styles.SplashScreen_RootView}>
-        <View style={styles.SplashScreen_ChildView}>
-          <Image
-            source={require('./AppIcons/fast_track_taxi_logo_ferdig.png')}
-            style={{width: '100%', height: '100%', resizeMode: 'contain'}}
-          />
-        </View>
-      </View>
-    );
-    return (
-      <View style={styles.MainContainer}>
-        <View style={styles.container}>
-          <View>
-            <Text style={styles.welcome}>Velkommen til</Text>
+    if (this.state.isVisible === true) {
+      return (
+          <View style={styles.SplashScreen_RootView}>
+            <View style={styles.SplashScreen_ChildView}>
+              <Image
+                  source={require('./assets/fast_track_taxi_logo_ferdig.png')}
+                  style={{width: '100%', height: '100%', resizeMode: 'contain'}}
+              />
+            </View>
           </View>
-          <Image
-            source={require('./AppIcons/fast_track_taxi_logo_ferdig.png')}
-            style={{width: 380, height: 380}}
-          />
-          <Text style={styles.instructions}>
-            Les vår Personvern. Trykk "Bekreft og fortsett" for å akseptere
-            Servicevilkår.
-          </Text>
-          <View style={styles.button}>
-            <Button
-              onPress={this.onPressButton}
-              title="BEKREFT OG FORTSETT"
-              color="#009933"
-            />
+      )
+    } else {
+      return (
+          <View style={styles.MainContainer}>
+          <WelcomeScreen/>
           </View>
-        </View>
-        {this.state.isVisible === true ? Splash_Screen : null}
-      </View>
-    );
+      );
+    }
   }
 }
+
+class Registration_mode extends React.Component {
+  render() {
+    return (
+        <NavigationContainer>
+          <NewRegistrationStack />
+        </NavigationContainer>
+    )
+  }
+}
+
 const styles = StyleSheet.create({
   MainContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: Platform.OS === 'ios' ? 20 : 0,
+    paddingTop: Constants.statusBarHeight,
   },
 
   SplashScreen_RootView: {
@@ -87,7 +143,7 @@ const styles = StyleSheet.create({
   SplashScreen_ChildView: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#009933',
+    //backgroundColor: '#84b07f',
     flex: 1,
   },
   container: {
@@ -97,7 +153,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   welcome: {
-    fontSize: 60,
+    fontSize: 50,
     textAlign: 'center',
     color: '#000000',
   },
@@ -110,7 +166,22 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: 20,
-    minWidth: '80%',
+    padding: 15,
+    minWidth: '70%',
     minHeight: '15%',
   },
+  linked: {
+    marginTop: 10,
+    textAlign: 'center',
+    margin: 10,
+    color: 'blue',
+    textDecorationLine: 'underline',
+  },
+  confirmButton: {
+    alignItems: 'center',
+    //backgroundColor: '#009933',
+    paddingVertical: 60,
+  },
 });
+
+export default Registration_mode;

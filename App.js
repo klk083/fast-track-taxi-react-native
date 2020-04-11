@@ -1,22 +1,18 @@
-import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import SplashScreen from './SplashScreen';
+import React from 'react';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 
-const Stack = createStackNavigator();
+import SplashScreen from "./SplashScreen";
+import Client_mode from "./Client/Client_mode";
+import Driver_mode from "./Driver/Driver_mode"
+import WelcomeScreen from "./WelcomeScreen"
+import Client_taxi_confirmation from "./Client/Client_taxi_confirmation";
 
-function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator mode="modal" headerMode="none">
-        <Stack.Screen
-          name="SplashScreen"
-          component={SplashScreen}
-          options={{headerShow: false}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
 
-export default App;
+const App = createSwitchNavigator({
+    //SplashScreen: SplashScreen,
+    //WelcomeScreen: WelcomeScreen,
+    //Client: Client_mode,
+    Driver: Driver_mode,
+});
+
+export default createAppContainer(App);

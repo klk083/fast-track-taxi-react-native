@@ -4,7 +4,7 @@
 
 import React from 'react';
 import {View, Text, Button} from 'react-native';
-import {createStackNavigator, createAppContainer} from 'react-navigation';
+import {createStackNavigator, createAppContainer} from '@react-navigation/native';
 
 class HomeScreen extends React.Component {
   render() {

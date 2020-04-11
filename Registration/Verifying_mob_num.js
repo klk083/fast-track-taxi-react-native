@@ -1,24 +1,9 @@
-import React, {Component} from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Button,
-  Alert,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, TextInput } from 'react-native';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Les vår Personvern.\n' +
-    'Trykk "Bekreft og fortsett" for å akseptere Servicevilkår.',
-});
+import { verifisering_info, send_ny_sms } from '../Common_files/Texts'
 
-export default class App extends Component {
+export default class Verifying_mob_num extends React.Component {
   state = {
     code: '',
   };
@@ -34,24 +19,22 @@ export default class App extends Component {
       [
         {
           text: 'Endre',
-          onPress: () => console.log('Endre ble valgt'),
+          onPress: () => this.props.navigation.navigate('Number_registration'),
           style: 'cancel',
         },
         {text: 'OK', onPress: () => console.log('OK ble valgt')},
       ],
-      {cancelable: false, onDismiss: () => {}},
+      {cancelable: false},
     );
   };
 
   render() {
+    const { tlf } = this.props.route.params;
     return (
-      <View style={{alignItems: 'center'}}>
+      <View style={styles.container}>
         <View>
-          <Text style={styles.topInfo}>Verfisering av +47 .......</Text>
-          <Text style={styles.info}>
-            Venter på en melding med engangskode sendt til +47 .......
-          </Text>
-          <Text style={styles.wrongNum}>Feil nummer?</Text>
+          <Text style={styles.info}>{verifisering_info}{tlf}</Text>
+          <Text style={styles.wrongNum} onPress={() => this.props.navigation.navigate('Number_registration')}>Feil nummer?</Text>
         </View>
         <View style={styles.row}>
           <TextInput
@@ -65,18 +48,18 @@ export default class App extends Component {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <Button
-            title="Send SMS på nytt"
-            style={styles.button}
-            onPress={() => this.verificationCode(this.state.code)}
-          />
+          <TouchableOpacity>
+            <Text
+                style={styles.button}
+                onPress={() => this.verificationCode(this.state.code)}>{send_ny_sms}</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.buttonContainer}>
-          <Button
-            title="Ring meg for verifisering"
-            style={styles.button}
-            onPress={() => this.verificationTlf(this.state.tlf)}
-          />
+          <TouchableOpacity>
+            <Text
+                style={styles.button}
+                onPress={() => {}}>Ring meg for verifisering</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -87,17 +70,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonContainer: {
-    padding: 10,
-    justifyContent: 'space-between',
-    paddingHorizontal: 120,
-  },
-  topInfo: {
-    marginTop: 20,
-    fontSize: 40,
-    textAlign: 'center',
-    color: '#4287f5',
+    paddingTop: 20,
+    paddingHorizontal: 60,
   },
   row: {
     alignItems: 'center',
@@ -119,17 +96,9 @@ const styles = StyleSheet.create({
     fontSize: 35,
   },
   button: {
-    fontSize: 20,
-    alignItems: 'center',
-    //backgroundColor: '#009933',
-    padding: 10,
-  },
-  buttonText: {
-    justifyContent: 'center',
     fontSize: 30,
-    alignItems: 'center',
-    backgroundColor: '#009933',
-    padding: 8,
+    backgroundColor: 'dodgerblue',
+    padding: 10,
   },
   wrongNum: {
     marginTop: 10,

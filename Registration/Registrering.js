@@ -1,22 +1,8 @@
 import React, {Component} from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Button,
-  Alert,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, TextInput } from 'react-native';
+import Constants from "expo-constants";
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Les vår Personvern.\n' +
-    'Trykk "Bekreft og fortsett" for å akseptere Servicevilkår.',
-});
+import { write_your_num, fft_info } from "../Common_files/Texts";
 
 export default class App extends Component {
   state = {
@@ -37,7 +23,8 @@ export default class App extends Component {
           onPress: () => console.log('Endre ble valgt'),
           style: 'cancel',
         },
-        {text: 'OK', onPress: () => console.log('OK ble valgt')},
+        {text: 'OK', onPress: () => {
+          this.props.navigation.navigate('Number_verification', {tlf: tlfnr})}},
       ],
       {cancelable: false, onDismiss: () => {}},
     );
@@ -45,13 +32,10 @@ export default class App extends Component {
 
   render() {
     return (
-      <View>
+      <View style={styles.container}>
         <View>
-          <Text style={styles.topInfo}>Skriv mobilnumeret ditt</Text>
-          <Text style={styles.info}>
-            Fast Track Taxi skal sende deg en melding for å verifisere
-            mobilnummeret ditt. {'\n'}Hva er nummeret ditt?
-          </Text>
+          <Text style={styles.topInfo}>{write_your_num}</Text>
+          <Text style={styles.fft_info}>{fft_info}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.mobnum}>+47</Text>
@@ -66,11 +50,9 @@ export default class App extends Component {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <Button
-            title="Neste"
-            style={styles.button}
-            onPress={() => this.verificationTlf(this.state.tlf)}
-          />
+          <TouchableOpacity>
+            <Text style={styles.button} onPress={() => this.verificationTlf(this.state.tlf)}>Neste</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -80,17 +62,19 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-  },
-  buttonContainer: {
-    justifyContent: 'center',
-    paddingHorizontal: 120,
   },
   topInfo: {
-    marginTop: 40,
-    fontSize: 40,
+    marginTop: Constants.statusBarHeight,
     textAlign: 'center',
-    color: '#4287f5',
+    fontSize: 45,
+    color: 'dodgerblue',
+  },
+  fft_info:{
+    textAlign: 'center',
+    fontSize: 25,
+    marginLeft: 25,
+    marginRight: 25,
+    marginTop: 10,
   },
   row: {
     flexDirection: 'row',
@@ -110,11 +94,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 35,
   },
+  buttonContainer: {
+    marginTop: 30,
+    paddingHorizontal: 130,
+  },
   button: {
-    fontSize: 20,
-    alignItems: 'center',
-    //backgroundColor: '#009933',
-    padding: 10,
+    fontSize: 40,
+    backgroundColor: 'dodgerblue',
+    textAlign: 'center',
   },
   buttonText: {
     justifyContent: 'center',
