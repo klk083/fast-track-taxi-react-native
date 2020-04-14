@@ -18,10 +18,12 @@ export default class FetchExample extends React.Component {
 
     this.state = {
       catName: 'ole',
+      name: 'et',
       owner: 'sara',
       pnum: '1234',
       lat: 1.01,
       long: -1,
+      messages: [],
       isLoading: true,
     };
     this.onPress = this.onPress.bind(this);

@@ -17,7 +17,7 @@ var con = mysql.createPool({
   debug: false,
 });
 
-//deprecated
+//test
 router.route('/test').get(function(req, res) {
   con.query('select * from cats', function(error, rows, fields) {
     if (error) {
@@ -28,7 +28,6 @@ router.route('/test').get(function(req, res) {
     }
   });
 });
-//deprecated
 router.get('/cats', function(req, res) {
   con.query(
     'INSERT INTO `cats`(`catName`, `owner`,`phoneNum`) VALUES ("ole","eier",123)',
@@ -42,8 +41,6 @@ router.get('/cats', function(req, res) {
     },
   );
 });
-
-//deprecated
 router.get('/delete', function(req, res) {
   con.query('DELETE FROM `cats` WHERE catName = "ole"', function(
     error,
@@ -58,8 +55,6 @@ router.get('/delete', function(req, res) {
     }
   });
 });
-
-//deprecated
 router.post('/new', function(req, res) {
   var catName = req.body.catName;
   var owner = req.body.owner;
@@ -83,145 +78,7 @@ router.post('/new', function(req, res) {
   });
   //res.end('yes');
 });
-
-//deprecated
-router
-  .route('/location')
-  .get()
-  .put()
-  .post(function(req, res) {
-    var userId = req.body.userId;
-    var lat = req.body.lat;
-    var long = req.body.long;
-
-    const sentence =
-      'INSERT INTO `location`(`userId`, `latitude`,`longitude`) VALUES ("' +
-      userId +
-      '", "' +
-      lat +
-      '", ' +
-      long +
-      ')';
-    con.query(sentence, function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    });
-  })
-  .delete();
-
-//adds user, get user, update user, delete user
-router
-  .route('/user') //concern all users
-  .get(function(req, res) {
-    var userId = req.body.userId;
-
-    const sentence = 'INSERT INTO `users`(`userId`) VALUES (' + userId + ')';
-    con.query(sentence, function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    });
-  }) //gets a user
-  .post(function(req, res) {
-    //adds a new user
-    let sentence = null;
-    var imei = req.body.imei;
-    var pnum = req.body.pnum;
-    if (req.body.name === !null) {
-      var name = req.body.name;
-      var taxiNum = req.body.taxiNum;
-      var company = req.body.company;
-      var orgNum = req.body.orgNum;
-      var billingAddr = req.body.billingAddr;
-      sentence =
-        'INSERT INTO `users`(`imei`, `phoneNum`, `name`, `taxiNum`, `company`, `orgNum`, `billingAddr`) VALUES (' +
-        imei +
-        ',' +
-        pnum +
-        ',' +
-        name +
-        ',' +
-        taxiNum +
-        ',' +
-        company +
-        ',' +
-        orgNum +
-        ',' +
-        billingAddr +
-        ')';
-    } else {
-      sentence =
-        'INSERT INTO `users`(`imei`, `phoneNum`) VALUES (' +
-        imei +
-        ',' +
-        pnum +
-        ')';
-    }
-
-    con.query(sentence, function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    });
-  }) //adds a new user
-  .put(function(req, res) {
-    //  not done
-    var imei = req.body.imei;
-    var pnum = req.body.pnum;
-    var name = req.body.name;
-    var taxiNum = req.body.taxiNum;
-    var company = req.body.company;
-    var orgNum = req.body.orgNum;
-    var billingAddr = req.body.billingAddr;
-
-    const sentence =
-      'INSERT INTO `users`(`imei`, `phoneNum`, `name`, `taxiNum`, `company`, `orgNum`, `billingAddr`) VALUES (' +
-      imei +
-      ',' +
-      pnum +
-      ',' +
-      name +
-      ',' +
-      taxiNum +
-      ',' +
-      company +
-      ',' +
-      orgNum +
-      ',' +
-      billingAddr +
-      ')';
-    con.query(sentence, function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    });
-  }) //updates a user
-  .delete(function(req, res) {
-    var userId = req.body.userId;
-
-    const sentence = 'DELETE FROM `users` WHERE `userId` = ' + userId;
-    con.query(sentence, function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    });
-  }); //deletes a user
+//end of test
 
 //deprecated
 router.post('/loc', function(req, res) {
@@ -250,5 +107,250 @@ router.post('/loc', function(req, res) {
 
 */
 }); //test
+
+// all
+//inprogress
+//done
+router.post('/register', function(req, res) {
+  if (req.body.name === !null) {
+    con.query(
+      'INSERT INTO `users`(`imei`, `phoneNum`, `name`, `taxiNum`, `company`, `orgNum`, `billingAddr`) VALUES (:imei,:pnum,:name,:taxiNum,:company,:orgNum,:billingAddr)',
+      {
+        imei: req.body.imei,
+        pnum: req.body.pnum,
+        name: req.body.name,
+        taxiNum: req.body.taxiNum,
+        company: req.body.company,
+        orgNum: req.body.orgNum,
+        billingAddr: req.body.billingAddr,
+      },
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(rows);
+          res.send(rows);
+        }
+      },
+    );
+  } else {
+    con.query(
+      'INSERT INTO `users`(`imei`, `phoneNum`) VALUES (:imei,:pnum)',
+      {
+        imei: req.body.imei,
+        pnum: req.body.pnum,
+      },
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(rows);
+          res.send(rows);
+        }
+      },
+    );
+  }
+}); // adds a user (driver,customer)
+
+//driver
+//inprogress
+//done
+router.get('/getorders', function(req, res) {
+  // gets orderId,dateTime,latitude,longitude to show driver
+  con.query(
+    'SELECT `orderId`,`dateTime`,`latitude`,`longitude`,`priority` FROM `orders`',
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(rows);
+      }
+    },
+  );
+}); // gets orderId,dateTime,latitude,longitude to show driver
+router.put('cancel order', function(req, res) {
+  con.query(
+    'UPDATE `orders` SET `canceled`=`true` WHERE `orderId`=:orderId;',
+    {
+      orderId: req.body.orderId,
+    },
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(rows);
+      }
+    },
+  );
+}); // cancels a order
+router.get('/takeorder', function(req, res) {
+  con.query(
+    'SELECT `phoneNum` FROM `orders` WHERE `orderId`=orderId; UPDATE `orders` SET `driver_id`=:driverId WHERE `orderId` = :orderId;',
+    {
+      orderId: req.body.orderId,
+      driver_id: req.body.driver_id,
+    },
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(rows);
+      }
+    },
+  );
+}); // takes order
+
+//customer
+//inprogress
+//done
+router.post('/make order', function(req, res) {
+  con.query(
+    'INSERT INTO `orders`(`phoneNum`, `latitude`, `logitude`) VALUES (:pnum, :latitude, :longitude)',
+    {
+      pnum: req.body.pnum,
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+    },
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(rows);
+      }
+    },
+  );
+}); // make a order
+router.put('/make prio', function(req, res) {
+  con.query(
+    'UPDATE `orders` SET `priority`=`true` WHERE `orderId`=:orderId;',
+    {
+      orderId: req.body.orderId,
+    },
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(rows);
+      }
+    },
+  );
+}); // set priority to true
+router.get('/get driver detail', function(req, res) {
+  con.query(
+    'SELECT `taxiNum` FROM `orders` INNER JOIN `users` USING (userId) WHERE orderId=:orderID',
+    {orderId: req.body.orderId},
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(rows);
+      }
+    },
+  );
+}); // get driver detail
+router.post('/rateDriver', function(req, res) {
+  con.query(
+    'INSERT INTO `vurdering`( `user_id1`, `rating`) VALUES (:userId, :rating)',
+    {
+      userId: req.body.userId,
+      rating: req.body.rating,
+    },
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(rows);
+      }
+    },
+  );
+}); // rateDriver
+router.delete('delete order', function(req, res) {
+  //removes order
+  con.query(
+    'DELETE FROM `orders` WHERE `orderId` = :orderId',
+    {
+      orderId: req.body.orderId,
+    },
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(JSON.stringify(true));
+      }
+    },
+  );
+}); // removes a user
+
+//admin
+//inprogress
+//done
+router.post('/newDriver', function(req, res) {
+  con.query(
+    'INSERT INTO `users`(`imei`, `phoneNum`, `name`, `taxiNum`, `company`, `orgNum`, `billingAddr`) VALUES (:imei,:pnum,:name,:taxiNum,:company,:orgNum,:billingAddr)',
+    {
+      imei: req.body.imei,
+      pnum: req.body.pnum,
+      name: req.body.name,
+      taxiNum: req.body.taxiNum,
+      company: req.body.company,
+      orgNum: req.body.orgNum,
+      billingAddr: req.body.billingAddr,
+    },
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(rows);
+      }
+    },
+  );
+}); //adds a driver
+router.delete('/deleteuser', function(req, res) {
+  //removes a user
+  con.query(
+    'DELETE FROM `users` WHERE `userId` = :userId',
+    {
+      userId: req.body.userId,
+    },
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(JSON.stringify(true));
+      }
+    },
+  );
+}); // removes a user
+router.put(function(req, res) {
+  con.query(
+    'UPDATE `users` SET `phoneNum`=:pnum,`name`=:name,`taxiNum`=:taxiNum,`company`=:company,`orgNum`=:orgNum,`billingAddr`=:billingAddr',
+    {
+      pnum: req.body.pnum,
+      name: req.body.name,
+      taxiNum: req.body.taxiNum,
+      company: req.body.company,
+      orgNum: req.body.orgNum,
+      billingAddr: req.body.billingAddr,
+    },
+    function(error, rows, fields) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(rows);
+        res.send(rows);
+      }
+    },
+  );
+}); //update a driver
 
 module.exports = router;
