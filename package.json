@@ -1,7 +1,7 @@
 {
-  "name": "FastTrackTaxi_ReactNative",
+  "name": "untitled2",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -10,14 +10,27 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-community/geolocation": "^2.0.2",
+    "axios": "^0.16.2",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1",
+    "node-fetch": "^2.6.0",
+    "nodemon": "^2.0.2",
     "react": "16.9.0",
-    "react-native": "0.61.5"
+    "react-native": "0.61.5",
+    "react-native-location": "^2.5.0",
+    "react-native-ssl-pinning": "^1.4.0",
+    "react-native-websocket": "^1.0.2",
+    "socket.io": "^2.3.0",
+    "whatwg-fetch": "^3.0.0",
+    "ws": "^7.2.3"
   },
   "devDependencies": {
-    "@babel/core": "7.8.4",
-    "@babel/runtime": "7.8.4",
-    "babel-jest": "24.9.0",
+    "@babel/core": "7.8.7",
+    "@babel/runtime": "7.8.7",
     "@react-native-community/eslint-config": "0.0.5",
+    "babel-jest": "24.9.0",
     "eslint": "6.8.0",
     "jest": "24.9.0",
     "metro-react-native-babel-preset": "0.56.4",
