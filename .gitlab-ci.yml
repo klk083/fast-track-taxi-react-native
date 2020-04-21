@@ -15,7 +15,7 @@ before_script:
       - export PATH=$PATH:$PWD/.android/platform-tools/
 
       # Install platform tools and Android SDK for the compile target
-      - echo y | $PWD/android/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
+      - echo y | $PWD/-/tree/master/android/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
 
 
       - curl -sL https://deb.nodesource.com/setup_10.x | bash #Add Node Repo
