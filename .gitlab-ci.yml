@@ -1,36 +1,44 @@
-.job_template: &job_deploy
-  stage: deploy
-  before_script:
-    - npm install
-  tags:
-    - rnbuild
-  after_script:
-    - cp $OUTPUT_PATH.$FILE_TYPE $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME.$FILE_TYPE
-  artifacts:
-    name: "$CI_PROJECT_NAME-$PLATFORM-$CI_COMMIT_REF_NAME"
-    paths:
-    - $CI_PROJECT_NAME-$CI_COMMIT_REF_NAME.$FILE_TYPE
-    expire_in: 7 days
-  when: manual
+image: openjdk:8-jdk #Defining the Docker Image
 
-deploy:android:prod:
-  variables:
-    PLATFORM: android
-    FILE_TYPE: apk
-    OUTPUT_PATH: android/app/build/outputs/apk/app-release
-  <<: *job_deploy
+variables:
+  ANDROID_COMPILE_SDK: "28" #set compile SDK version
+  ANDROID_BUILD_TOOLS: "28.0.2" #set build tool version
+  ANDROID_SDK_TOOLS:   "4333796" #set SDK tool build number you can find yous here https://developer.android.com/studio/releases/sdk-tools
+
+before_script:
+  # Fetch the specified SDK tools version to build with
+      - wget --quiet --output-document=/tmp/sdk-tools-linux.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
+      - unzip /tmp/sdk-tools-linux.zip -d .android
+
+      # Set up environment variables
+      - export ANDROID_HOME=$PWD/.android
+      - export PATH=$PATH:$PWD/.android/platform-tools/
+
+      # Install platform tools and Android SDK for the compile target
+      - echo y | .android/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
+
+
+      - curl -sL https://deb.nodesource.com/setup_10.x | bash #Add Node Repo
+      - apt-get install -y nodejs #Install NOde JS
+      - npm install -g react-native-cli #Install React-Native CLI
+      - npm install #Install npm packages
+      - react-native link #Link the resources
+      - chmod +x android/gradlew #Provide permission for execution
+
+# Define stages 
+stages:
+  - build_release_android
+
+build_release_android:
+  stage: build_release_android
   script:
-    - cd android && ./gradlew assembleRelease -PMYAPP_RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD -PMYAPP_RELEASE_KEY_PASSWORD=$KEYSTORE_PASSWORD
-  
-deploy:ios:prod:
-  variables:
-    PLATFORM: ios
-    FILE_TYPE: ipa
-    OUTPUT_PATH: ./$CI_PROJECT_NAME
-  <<: *job_deploy
-  script:
-    - export PACKAGE_NAME=$(node -p -e "require('./package.json').name")
-    - cd ios
-    - xcodebuild -scheme $PACKAGE_NAME archive -archivePath $PACKAGE_NAME.xcarchive -allowProvisioningUpdates
-    - xcodebuild -exportArchive -archivePath ./$PACKAGE_NAME.xcarchive -exportPath . -exportOptionsPlist $PACKAGE_NAME/Info.plist
-    - mv $PACKAGE_NAME.ipa ../$PACKAGE_NAME.ipa
+    - mkdir /PlayJson #make temp directory named PlayJson in root of project
+    - "echo $PLAY_STORE_JSON > /PlayJson/play-store-key.json" # copy git variable value to play-store-key.json file
+    - npm run android-bundle # bundle the app (Execute from package.json's script block)
+    - npm run android-release #create release app (Execute from package.json's script block)
+    - cd android && ./gradlew publishApkRelease  # navigate to android dir & publish app on play store
+  only:
+    - master #set trigger for CICD if push or merge in master branch
+  artifacts:
+    paths:
+    - ./android/app/build/outputs/  # set artifact path which store your APK file
