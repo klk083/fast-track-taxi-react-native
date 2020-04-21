@@ -1,7 +1,7 @@
 {
   "name": "untitled2",
   "version": "0.0.1",
-  "private": false,
+  "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -24,7 +24,20 @@
     "react-native-websocket": "^1.0.2",
     "socket.io": "^2.3.0",
     "whatwg-fetch": "^3.0.0",
-    "ws": "^7.2.3"
+    "ws": "^7.2.3",
+    "@react-native-community/masked-view": "0.1.6",
+    "@react-navigation/drawer": "^5.4.1",
+    "@react-navigation/native": "^5.1.4",
+    "@react-navigation/stack": "^5.2.9",
+    "react-dom": "~16.9.0",
+    "react-native-gesture-handler": "~1.6.0",
+    "react-native-reanimated": "~1.7.0",
+    "react-native-safe-area-context": "0.7.3",
+    "react-native-screens": "~2.2.0",
+    "react-native-unimodules": "~0.9.0",
+    "react-native-vector-icons": "^6.6.0",
+    "react-native-web": "~0.11.7",
+    "react-navigation": "^4.3.7"
   },
   "devDependencies": {
     "@babel/core": "7.8.7",
