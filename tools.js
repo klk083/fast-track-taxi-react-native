@@ -1,3 +1,6 @@
+var jwt = require('jsonwebtoken');
+var secret = '4ecf096c08b97a3b3ba79deae1d3bd865623da9e09b549f50da3eb7f93ac5c15';
+
 module.exports = {
   // collected from:
   // https://www.geodatasource.com/developers/javascript
@@ -23,8 +26,19 @@ module.exports = {
       return dist;
     }
   },
-  bar: function() {
-    // next
-    // whatever
+  getToken: function(secretGotten) {
+    var token = jwt.sign({username: secretGotten}, secretGotten, {
+      expiresIn: 120,
+    });
+    return token;
+  },
+  verify: function(token) {
+    jwt.verify(token, secret, function(err, decoded) {
+      if (!err) {
+        return true;
+      } else {
+        return false;
+      }
+    });
   },
 };

@@ -148,12 +148,11 @@ export default class FetchExample extends React.Component {
   }
 
   onPress5() {
-    fetch('http://192.168.1.19:8080/loc', {
+    fetch('http://192.168.1.19:8080/tokenroute', {
       method: 'POST',
       headers: {'content-type': 'application/json'},
       body: JSON.stringify({
-        lat: this.state.lat,
-        long: this.state.long,
+        uid: 'tester',
       }),
     })
       .then(response => response.json())
@@ -198,7 +197,7 @@ export default class FetchExample extends React.Component {
           style={{paddingTop: 33}}
           onPress={this.onPress2}
         />
-        <Button title="geo" onPress={this.onPress5} />
+        <Button title="token" onPress={this.onPress5} />
         <Text>Location: {this.state.location}</Text>
       </View>
     );
