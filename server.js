@@ -1,11 +1,12 @@
-const WebSocket = require('ws');
+var http = require('http');
 
-const wss = new WebSocket.Server({port: 8080});
+var express = require('express');
+var app = express();
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
-  });
+var routers = require('./routers');
 
-  ws.send('something');
-});
+app.all('*', routers);
+
+var httpServer = http.createServer(app);
+
+httpServer.listen(8080);

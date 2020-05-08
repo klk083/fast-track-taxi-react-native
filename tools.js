@@ -30,14 +30,17 @@ module.exports = {
     var token = jwt.sign({username: secretGotten}, secretGotten, {
       expiresIn: 120,
     });
+    console.log('Token given');
     return token;
   },
   verify: function(token) {
-    jwt.verify(token, secret, function(err, decoded) {
+    return jwt.verify(token, secret, function(err, decoded) {
       if (!err) {
+        console.log('Token Verified');
         return true;
       } else {
-        return false;
+        console.log('Token failed');
+        return err;
       }
     });
   },

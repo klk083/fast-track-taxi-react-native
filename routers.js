@@ -1,8 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var jwt = require('jsonwebtoken');
-var fs = require('fs');
-var secret = '4ecf096c08b97a3b3ba79deae1d3bd865623da9e09b549f50da3eb7f93ac5c15';
 
 var bodyParser = require('body-parser');
 router.use(bodyParser.json({type: 'application/json'}));
@@ -20,72 +17,107 @@ var con = mysql.createPool({
   debug: false,
 });
 
-//test
-router.route('/test').get(function(req, res) {
-  con.query('select * from cats', function(error, rows, fields) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log(rows);
-      res.send(rows);
-    }
-  });
-});
-
 // all
 //done
-
+/*
+router.use(function(req, res) {
+  // start 404 page
+  res
+    .status(404)
+    .send(
+      'We think you are lost, the cov-19 virus is everywhere, you should not wonder around without purpose.',
+    );
+}); // end 404 page
+*/
 router.post('/token', function(req, res) {
   const secretGotten = req.body.secretGotten;
   res.send(tools.getToken(secretGotten));
 });
 
 //inprogress
-
+/*
 router.post('/register', function(req, res) {
-  if (req.body.name === !null) {
-    con.query(
-      'INSERT INTO `users`(`imei`, `phoneNum`, `name`, `taxiNum`, `company`, `orgNum`, `billingAddr`) VALUES (:imei,:pnum,:name,:taxiNum,:company,:orgNum,:billingAddr)',
-      {
-        imei: req.body.imei,
-        pnum: req.body.pnum,
-        name: req.body.name,
-        taxiNum: req.body.taxiNum,
-        company: req.body.company,
-        orgNum: req.body.orgNum,
-        billingAddr: req.body.billingAddr,
-      },
-      function(error, rows, fields) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log(rows);
-          res.send(rows);
-        }
-      },
-    );
+  const token = req.body.token;
+  if (tools.verify(token) == true) {
+    const uniqId = req.body.uniqId;
+    const pnum = req.body.pnum;
+    const name = req.body.name;
+    if (name === !null) {
+      const taxiNum = req.body.taxiNum;
+      const company = req.body.company;
+      const orgNum = req.body.orgNum;
+      const billingAddr = req.body.billingAddr;
+      con.query(
+        'INSERT INTO `users`(`uniqId`, `phoneNum`, `name`, `taxiNum`, `company`, `orgNum`, `billingAddr`) VALUES (?,?,?,?,?,?,?)',
+        [uniqId, pnum, name, taxiNum, company, orgNum, billingAddr],
+        function(error, rows, fields) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log(rows);
+            res.send(rows);
+          }
+        },
+      );
+    } else {
+      con.query(
+        'INSERT INTO `users`(`uniqId`, `phoneNum`) VALUES (?,?)',
+        [uniqId, pnum],
+        function(error, rows, fields) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log(rows);
+            res.send(rows);
+          }
+        },
+      );
+    }
   } else {
-    con.query(
-      'INSERT INTO `users`(`imei`, `phoneNum`) VALUES (:imei,:pnum)',
-      {
-        imei: req.body.imei,
-        pnum: req.body.pnum,
-      },
-      function(error, rows, fields) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log(rows);
-          res.send(rows);
-        }
-      },
-    );
+    res.send(false);
   }
 }); // adds a user (driver,customer)
+*/
+/* should users
+router.post('/registerCustomer', function(req, res) {
+  const token = req.body.token;
+  if (tools.verify(token) == true) {
+    const phoneNumber = req.body.phoneNumber;
+    const deviceId = req.body.deviceId;
+    let userId = '';
+    con.query(
+        'INSERT INTO `users` (`phoneNumber`,deviceId) VALUES (?,?)',
+        [phoneNumber, deviceId],
+        function(error, rows) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log(rows.insertId);
+            userId = rows.insertId;
+          }
+        },
+    );
+    con.query(
+        'INSERT INTO `customers` (userId) VALUES (?)',
+        [userId],
+        function(error, rows) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log(rows.insertId);
+            userId = rows.insertId;
+          }
+        },
+    );
 
-//driver
+  } else {
+    res.send(false);
+  }
+}); // make a order
+*/
+
+/*driver
 //inprogress
-//done
 router.get('/getorders', function(req, res) {
   // gets orderId,dateTime,latitude,longitude to show driver
   con.query(
@@ -133,40 +165,45 @@ router.get('/takeorder', function(req, res) {
     },
   );
 }); // takes order
-
-//customer
-//done
+*/
+//start customer
+//inprogress
 router.post('/makeorder', function(req, res) {
-  const pnum = req.body.pnum;
+  const deviceId = req.body.deviceId;
   const latitude = req.body.latitude;
   const longitude = req.body.longitude;
   const token = req.body.token;
   if (tools.verify(token) == true) {
     con.query(
-      'INSERT INTO `orders`(`phoneNum`, `latitude`, `longitude`) VALUES (?, ?, ?)',
-      [pnum, latitude, longitude],
+      'INSERT INTO `orders` ( `customerId`, `latitude`, `longitude`) SELECT `customerId`,?,? FROM `userCustomer` WHERE `deviceId` = ?;',
+      [latitude, longitude, deviceId],
       function(error, rows, fields) {
         if (error) {
           console.log(error);
         } else {
-          console.log(rows);
-          res.send(true);
+          if (rows.insertId > 0) {
+            console.log('Order created:' + rows.insertId);
+            res.send(rows.insertId.toString());
+          } else {
+            res.send(false);
+          }
         }
       },
     );
   } else {
-    res.send('Not valid token');
+    res.send(false);
   }
 }); // make a order
 
 router.put('/makeprio', function(req, res) {
   // set priority to true, start
   const token = req.body.token;
-  const orderId = req.body.orderId;
+  const deviceId = req.body.deviceId;
   if (tools.verify(token) == true) {
     con.query(
-      'UPDATE `orders` SET `priority`=`true` WHERE `orderId`=?;',
-      [orderId],
+      //'UPDATE `orders` SET `priority`=`true` WHERE `orderId`=`users.userId`',
+      'UPDATE `orders` SET `orders.priority` = `true` FROM  `orders` INNER JOIN `users` ON `orders.customerId` = `users.userId` WHERE `users.deviceId` = ?',
+      [deviceId],
       function(error, rows, fields) {
         if (error) {
           console.log(error);
@@ -180,58 +217,92 @@ router.put('/makeprio', function(req, res) {
     res.send('Not valid token');
   }
 }); // set priority to true, end
-
-//inprogess
 router.get('/getdriverdetail', function(req, res) {
-  con.query(
-    'SELECT `taxiNum` FROM `orders` INNER JOIN `users` USING (userId) WHERE orderId=:orderID',
-    {orderId: req.body.orderId},
-    function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    },
-  );
+  //when a driver has taken te order
+  const token = req.body.token;
+  if (tools.verify(token) == true) {
+    con.query(
+      'SELECT `taxiNum` FROM `orders` INNER JOIN `users` USING (userId) WHERE orderId=?',
+      [req.body.orderId],
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(rows);
+          res.send(rows);
+        }
+      },
+    );
+  } else {
+    res.send('Not valid token');
+  }
 }); // get driver detail
-router.post('/rateDriver', function(req, res) {
-  con.query(
-    'INSERT INTO `vurdering`( `user_id1`, `rating`) VALUES (:userId, :rating)',
-    {
-      userId: req.body.userId,
-      rating: req.body.rating,
-    },
-    function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    },
-  );
+router.put('/rateDriver', function(req, res) {
+  const token = req.body.token;
+  const userId = req.body.userId;
+  const rating = req.body.rating;
+  if (tools.verify(token) == true) {
+    con.query(
+      'INSERT INTO `vurdering`( `userId`, `rating`) VALUES (?, ?)',
+      [userId, rating],
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(rows);
+          res.send(rows);
+        }
+      },
+    );
+  } else {
+    res.send('Not valid token');
+  }
 }); // rateDriver
-router.delete('delete order', function(req, res) {
-  //removes order
-  con.query(
-    'DELETE FROM `orders` WHERE `orderId` = :orderId',
-    {
-      orderId: req.body.orderId,
-    },
-    function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(JSON.stringify(true));
-      }
-    },
-  );
+router.post('/cancelOrder', function(req, res) {
+  // cancels order
+  const token = req.body.token;
+  const reason = 'Customer canceled order before driver took order';
+  const orderId = req.body.orderId;
+  let isSucsessfull = false;
+  if (tools.verify(token) == true) {
+    con.query(
+      'UPDATE `orders` SET `archived` = 0 WHERE `orderId` =?',
+      [orderId],
+      function(error, rows) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(rows);
+          if (rows.affectedRows > 0) {
+            isSucsessfull = true;
+          }
+        }
+      },
+    );
+    con.query(
+      'INSERT INTO `cancelations` (`orderId`, `reasonForCancelation`) VALUES (?, ?)',
+      [orderId, reason],
+      function(error, rows) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(rows);
+          if (rows.insertId > 0 && isSucsessfull) {
+            res.send(isSucsessfull.toString());
+          } else {
+            res.send(isSucsessfull.toString());
+          }
+        }
+      },
+    );
+  } else {
+    res.send('Not valid token');
+  }
 }); // removes a user
+//done
+//end customer
 
-//admin
+//start admin
 //inprogress
 router.post('/newDriver', function(req, res) {
   con.query(
