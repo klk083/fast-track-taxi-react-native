@@ -9,12 +9,12 @@ var tools = require('./tools');
 
 var mysql = require('mysql');
 var con = mysql.createPool({
-  connectionLimit: 2,
   host: 'mysql-ait.stud.idi.ntnu.no',
   user: 'karoljd',
   password: 'RzrcCKT6',
   database: 'karoljd',
   debug: false,
+  multipleStatements: true,
 });
 
 // all
@@ -116,23 +116,9 @@ router.post('/registerCustomer', function(req, res) {
 }); // make a order
 */
 
-/*driver
-//inprogress
-router.get('/getorders', function(req, res) {
-  // gets orderId,dateTime,latitude,longitude to show driver
-  con.query(
-    'SELECT `orderId`,`dateTime`,`latitude`,`longitude`,`priority` FROM `orders`',
-    function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    },
-  );
-}); // gets orderId,dateTime,latitude,longitude to show driver
-router.put('cancel order', function(req, res) {
+// Start driver
+/* inprogress
+router.put('cancelorder', function(req, res) {
   con.query(
     'UPDATE `orders` SET `canceled`=`true` WHERE `orderId`=:orderId;',
     {
@@ -148,26 +134,131 @@ router.put('cancel order', function(req, res) {
     },
   );
 }); // cancels a order
-router.get('/takeorder', function(req, res) {
-  con.query(
-    'SELECT `phoneNum` FROM `orders` WHERE `orderId`=orderId; UPDATE `orders` SET `driver_id`=:driverId WHERE `orderId` = :orderId;',
-    {
-      orderId: req.body.orderId,
-      driver_id: req.body.driver_id,
-    },
-    function(error, rows, fields) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(rows);
-        res.send(rows);
-      }
-    },
-  );
-}); // takes order
+
+
 */
+
+//done
+router.get('/getorders', function(req, res) {
+  // getOrders
+  // gets orderId,dateTimeOfOrder,latitude,longitude, priority to show driver
+  const token = req.body.token;
+  if (tools.verify(token) == true) {
+    con.query(
+      'SELECT `orderId`,`dateTimeOfOrder`,`latitude`,`longitude`,`priority` FROM `orders` WHERE `isTaken` = 0',
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(rows);
+          res.send(rows);
+        }
+      },
+    );
+  } else {
+    res.send('Not valid token');
+  }
+}); // getOrders
+router.post('/takeorder', function(req, res) {
+  const orderId = req.body.orderId;
+  const deviceId = req.body.deviceId;
+  const token = req.body.token;
+  if (tools.verify(token) == true) {
+    let isSucsess = false;
+    con.query(
+      //'START TRANSACTION; SELECT `isTaken` FROM `orders` WHERE `orderId` = ?; UPDATE `orders` SET `isTaken` = 1 WHERE `isTaken` = 0 AND orderId=?; COMMIT;',
+      'START TRANSACTION; UPDATE `orders` SET `isTaken` = 1 WHERE `isTaken` = 0 AND orderId=?; COMMIT;',
+      [orderId],
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+          con.destroy();
+        } else {
+          if (rows.affectedRows > 0) {
+            console.log('Order isTaken changed on:' + orderId);
+            isSucsess = true;
+          } else {
+            console.log('Order isTaken change failed on:' + orderId);
+            res.send(false);
+          }
+        }
+      },
+    );
+    con.query(
+      'INSERT INTO `ordersTaken` ( `orderId`, `driverId`) SELECT ?, `driverId` FROM `userDriver` WHERE `deviceId` = ?; SELECT `phoneNumber` FROM `orderPhoneNumber` WHERE `orderId` = ?',
+      [orderId, deviceId, orderId],
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+        } else {
+          if (rows.insertId > 0) {
+            console.log('ordersTaken insterted orderId:' + orderId);
+            res.send(isSucsess);
+          } else {
+            console.log('ordersTaken failed insterting orderId:' + orderId);
+            res.send(false);
+          }
+        }
+      },
+    );
+  } else {
+    res.send(false);
+  }
+}); // take an order
+router.put('/endTrip', function(req, res) {
+  // changes archived to true
+  const token = req.body.token;
+  const orderId = req.body.orderId;
+  if (tools.verify(token) == true) {
+    con.query(
+      'UPDATE `orders` SET `orders.arvhived` = `1` WHERE `orderId` = ?',
+      [orderId],
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+        } else {
+          if (rows.affectedRows > 0) {
+            console.log(rows);
+            res.send(true);
+          } else {
+            res.send(false);
+          }
+        }
+      },
+    );
+  } else {
+    res.send('Not valid token');
+  }
+}); // set priority to true, end
+
+// End driver
+
 //start customer
-//inprogress
+/*inprogress
+router.put('/rateDriver', function(req, res) {
+  const token = req.body.token;
+  const userId = req.body.userId;
+  const rating = req.body.rating;
+  if (tools.verify(token) == true) {
+    con.query(
+      'INSERT INTO `vurdering`( `userId`, `rating`) VALUES (?, ?)',
+      [userId, rating],
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(rows);
+          res.send(rows);
+        }
+      },
+    );
+  } else {
+    res.send('Not valid token');
+  }
+}); // rateDriver
+*/
+
+//done
 router.post('/makeorder', function(req, res) {
   const deviceId = req.body.deviceId;
   const latitude = req.body.latitude;
@@ -194,22 +285,24 @@ router.post('/makeorder', function(req, res) {
     res.send(false);
   }
 }); // make a order
-
 router.put('/makeprio', function(req, res) {
   // set priority to true, start
   const token = req.body.token;
-  const deviceId = req.body.deviceId;
+  const orderId = req.body.orderId;
   if (tools.verify(token) == true) {
     con.query(
-      //'UPDATE `orders` SET `priority`=`true` WHERE `orderId`=`users.userId`',
-      'UPDATE `orders` SET `orders.priority` = `true` FROM  `orders` INNER JOIN `users` ON `orders.customerId` = `users.userId` WHERE `users.deviceId` = ?',
-      [deviceId],
+      'UPDATE `orders` SET `orders.priority` = `1` WHERE `orderId` = ?',
+      [orderId],
       function(error, rows, fields) {
         if (error) {
           console.log(error);
         } else {
-          console.log(rows);
-          res.send(rows);
+          if (rows.affectedRows > 0) {
+            console.log(rows);
+            res.send(true);
+          } else {
+            res.send(false);
+          }
         }
       },
     );
@@ -217,47 +310,6 @@ router.put('/makeprio', function(req, res) {
     res.send('Not valid token');
   }
 }); // set priority to true, end
-router.get('/getdriverdetail', function(req, res) {
-  //when a driver has taken te order
-  const token = req.body.token;
-  if (tools.verify(token) == true) {
-    con.query(
-      'SELECT `taxiNum` FROM `orders` INNER JOIN `users` USING (userId) WHERE orderId=?',
-      [req.body.orderId],
-      function(error, rows, fields) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log(rows);
-          res.send(rows);
-        }
-      },
-    );
-  } else {
-    res.send('Not valid token');
-  }
-}); // get driver detail
-router.put('/rateDriver', function(req, res) {
-  const token = req.body.token;
-  const userId = req.body.userId;
-  const rating = req.body.rating;
-  if (tools.verify(token) == true) {
-    con.query(
-      'INSERT INTO `vurdering`( `userId`, `rating`) VALUES (?, ?)',
-      [userId, rating],
-      function(error, rows, fields) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log(rows);
-          res.send(rows);
-        }
-      },
-    );
-  } else {
-    res.send('Not valid token');
-  }
-}); // rateDriver
 router.post('/cancelOrder', function(req, res) {
   // cancels order
   const token = req.body.token;
@@ -298,12 +350,33 @@ router.post('/cancelOrder', function(req, res) {
   } else {
     res.send('Not valid token');
   }
-}); // removes a user
-//done
+}); // change status on order to archived, and instert into cancelation
+router.get('/getOrderTaxiNum', function(req, res) {
+  //when a driver has taken te order
+  const token = req.body.token;
+  const orderId = req.body.orderId;
+  if (tools.verify(token) == true) {
+    con.query(
+      'SELECT `taxiNum` FROM `ordersTaxiNum` WHERE `orderId` = ?',
+      [orderId],
+      function(error, rows, fields) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(rows);
+          res.send(rows);
+        }
+      },
+    );
+  } else {
+    res.send('Not valid token');
+  }
+}); // get the taxi number for the driver on the order
+
 //end customer
 
 //start admin
-//inprogress
+/* inprogress
 router.post('/newDriver', function(req, res) {
   con.query(
     'INSERT INTO `users`(`imei`, `phoneNum`, `name`, `taxiNum`, `company`, `orgNum`, `billingAddr`) VALUES (:imei,:pnum,:name,:taxiNum,:company,:orgNum,:billingAddr)',
@@ -364,6 +437,9 @@ router.put(function(req, res) {
     },
   );
 }); //update a driver
+
+
+ */
 //done
 
 module.exports = router;
